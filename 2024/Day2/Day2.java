@@ -32,8 +32,6 @@ public class Day2 {
   }
 
   private static boolean problemDampener(ArrayList<Integer> nums) {
-    // Which way does the list go
-    boolean isAscending = nums.get(1) > nums.get(0);
     // In case no dampener is needed
     if (isValidSequence(nums))
       return true;
@@ -41,8 +39,6 @@ public class Day2 {
       // Creating a test list based of the original and removing current index
       ArrayList<Integer> testList = new ArrayList<>(nums);
       testList.remove(i);
-      // Re-checking the orientation of the sequence after removing item i
-      isAscending = testList.get(1) > testList.get(0);
       // If the new list is good to go great
       // If not we will check every iteration of the list minus one number
       if (isValidSequence(testList))
@@ -59,7 +55,6 @@ public class Day2 {
       String line;
       while ((line = br.readLine()) != null) {
         ArrayList<Integer> nums = convertStringToNumberList(line);
-        boolean isAscending = nums.get(1) > nums.get(0);
         if (isValidSequence(nums)) {
           totalSafe++;
         }
@@ -77,7 +72,6 @@ public class Day2 {
       String line;
       while ((line = br.readLine()) != null) {
         ArrayList<Integer> nums = convertStringToNumberList(line);
-        boolean isAscending = nums.get(1) > nums.get(0);
         if (problemDampener(nums)) {
           totalSafe++;
         }
