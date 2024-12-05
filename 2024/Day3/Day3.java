@@ -1,49 +1,55 @@
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class Day3 {
+  private static Pattern partOne = Pattern.compile("mul\\((\\d+),(\\d+)\\)"); // matches the 2 numbers if they are in
+                                                                              // the mul(num,num) format
+  private static Pattern partTwo = Pattern.compile("do\\(\\)|don't\\(\\)|mul\\((\\d+),(\\d+)\\)"); // matches either a
+                                                                                                   // do() a don't() or
+                                                                                                   // partOne
 
-  private static ArrayList<String> getListOfSequences(String text) {
-    ArrayList<String> seqList = new ArrayList<>();
-    Pattern pattern = Pattern.compile("mul\\(\\d+,\\d+\\)");
+  public static int sumValidMultiplications(String text, Pattern pattern) {
+    int totalSum = 0; // Counter
+    boolean isEnabled = true; // Will change based on what the most recent do or don't is when it comes time
+                              // to see if a mul is correct
+
     Matcher matcher = pattern.matcher(text);
+
     while (matcher.find()) {
-      String item = matcher.group();
-      seqList.add(item);
+      String match = matcher.group();
+      if (match.equals("do()")) {
+        isEnabled = true;
+      } else if (match.equals("don't()")) {
+        isEnabled = false;
+      } else {
+        if (isEnabled) { // if the last thing before a mul was dont this gets skipped
+          int x = Integer.parseInt(matcher.group(1));
+          int y = Integer.parseInt(matcher.group(2));
+          totalSum += x * y;
+        }
+      }
     }
-    return seqList;
+
+    return totalSum;
   }
 
-  private static int seqToMath(String seq) {
-    String[] splitSeq = seq.split(",");
-    return Integer.parseInt(splitSeq[0].substring(4))
-        * Integer.parseInt(splitSeq[1].substring(0, splitSeq[1].length() - 1));
-  }
-
-  private static int sumOfResults(ArrayList<String> list) {
-    int total = 0;
-    for (String seq : list) {
-      total += seqToMath(seq);
-    }
-    return total;
-  }
-
-  private static void partOneSolver(Path filename) {
+  private static void solver() {
+    // Getting the entire file onto a string to pass onto the solver
+    Path filename = Path.of("inputs.txt");
     try {
-      String content = Files.readString(filename);
-      ArrayList<String> seqList = getListOfSequences(content);
-      System.out.println("The total is: " + sumOfResults(seqList));
+      String text = Files.readString(filename);
+      System.out.println("Part One Solution: " + sumValidMultiplications(text, partOne));
+      System.out.println("Part Two Solution: " + sumValidMultiplications(text, partTwo));
     } catch (IOException e) {
       System.out.println("Could not read file: " + e.getMessage());
     }
+
   }
 
   public static void main(String[] args) {
-    Path filename = Path.of("inputs.txt");
-    partOneSolver(filename);
+    solver();
   }
 }
