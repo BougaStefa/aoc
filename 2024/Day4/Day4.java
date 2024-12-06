@@ -121,7 +121,44 @@ public class Day4 {
     return potentialM.equals("M") && potentialA.equals("A") && potentialS.equals("S");
   }
 
+  // PART 2
+  private static boolean isDiagRight(ArrayList<String> list, int index, int lineIndex) {
+    // Got to have at least room for 1 thing above, below, right and left
+    if (index < 1 || list.size() - index < 1 || lineIndex < 1 || list.get(index).length() - lineIndex < 1) {
+      return false;
+    }
+    String topLeft = list.get(index - 1).substring(lineIndex - 1, lineIndex);
+    String bottomRight = list.get(index + 1).substring(lineIndex + 1, lineIndex + 2);
+    return (topLeft.equals("M") && bottomRight.equals("S")) || (topLeft.equals("S") && bottomRight.equals("M"));
+  }
+
+  private static boolean isDiagLeft(ArrayList<String> list, int index, int lineIndex) {
+    // Got to have at least room for 1 thing above, below, right and left
+    if (index == 0 || index == list.size() - 1 || lineIndex == 0 || lineIndex == list.get(index).length() - 1) {
+      return false;
+    }
+    String topRight = list.get(index - 1).substring(lineIndex + 1, lineIndex + 2);
+    String bottomLeft = list.get(index + 1).substring(lineIndex - 1, lineIndex);
+    return (topRight.equals("M") && bottomLeft.equals("S")) || (topRight.equals("S") && bottomLeft.equals("M"));
+  }
+
+  private static void partTwoSolver() {
+    int counter = 0;
+    ArrayList<String> list = linesToList(input);
+    for (int i = 0; i < list.size(); i++) {
+      String line = list.get(i);
+      for (int j = 0; j < line.length(); j++) {
+        String character = String.valueOf(line.charAt(j));
+        if (character.equals("A")) {
+          counter += (isDiagLeft(list, i, j) && isDiagRight(list, i, j)) ? 1 : 0;
+        }
+      }
+    }
+    System.out.println("Total is: " + counter);
+  }
+
   public static void main(String[] args) {
     partOneSolver();
+    partTwoSolver();
   }
 }
