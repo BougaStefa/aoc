@@ -12,8 +12,8 @@ import java.util.regex.Pattern;
 public class Day5 {
   private static final String input = "inputs.txt";
   private static final String test = "test.txt";
-  private static final List<int[]> rules = getRules(input);
   private static final List<int[]> pages = getPages(input);
+  private static final List<int[]> rules = getRules(input);
 
   private static List<int[]> getRules(String filename) {
     List<int[]> xy = new ArrayList<>();
@@ -94,42 +94,61 @@ public class Day5 {
   private static void getSumOfValids() {
     int counter = 0;
     for (int[] page : pages) {
-      System.out.println("\nChecking sequence: " + Arrays.toString(page));
       boolean looksGood = true;
       for (int i = 0; i < page.length; i++) {
-        System.out.println("\n  Checking position " + i + " (value " + page[i] + "):");
-        Set<Integer> mustBeAfter = getMustBeAfter(page[i], rules);
-        Set<Integer> mustBeBefore = getMustBeBefore(page[i], rules);
-        System.out.println("    Must be after: " + mustBeAfter);
-        System.out.println("    Must be before: " + mustBeBefore);
-
         boolean safeBeforeResult = isSafeBefore(getMustBeBefore(page[i], rules), page, i);
         boolean safeAfterResult = isSafeAfter(getMustBeAfter(page[i], rules), page, i);
-        System.out.println("    isSafeBefore: " + safeBeforeResult);
-        System.out.println("    isSafeAfter: " + safeAfterResult);
 
         if (!safeBeforeResult || !safeAfterResult) {
-          System.out.println("    Failed validation!");
           looksGood = false;
           break;
         }
       }
       if (looksGood) {
-        System.out.println("  Sequence is valid!");
         counter += page[Math.round(page.length / 2)];
-      } else {
-        System.out.println("  Sequence is invalid!");
       }
+
     }
     System.out.println("\nSum for part one is: " + counter);
   }
 
-  public static void main(String[] args) {
-    System.out.println("Rules loaded:");
-    for (int[] rule : rules) {
-      System.out.println(rule[0] + " must be before " + rule[1]);
+  private static List<int[]> getInvalidPages() {
+    List<int[]> invalids = new ArrayList<>();
+    for (int[] page : pages) {
+      for (int i = 0; i < page.length; i++) {
+        boolean safeBeforeResult = isSafeBefore(getMustBeBefore(page[i], rules), page, i);
+        boolean safeAfterResult = isSafeAfter(getMustBeAfter(page[i], rules), page, i);
+        if (!safeBeforeResult || !safeAfterResult) {
+          invalids.add(page);
+          break;
+        }
+      }
     }
-    System.out.println("\nStarting validation...");
+    return invalids;
+  }
+
+  private static void getSumOfInvalids(List<int[]> invalids) {
+    int counter = 0;
+    for (int[] page : invalids) {
+      for (int i = 0; i < page.length; i++) {
+        Set<Integer> mustBeBefore = getMustBeBefore(page[i], rules);
+        for (int j = i + 1; j < page.length; j++) {
+          if (mustBeBefore.contains(page[j])) {
+            int temp = page[i];
+            page[i] = page[j];
+            page[j] = temp;
+            i--;
+            break;
+          }
+        }
+      }
+      counter += page[Math.round(page.length / 2)];
+    }
+    System.out.println("Total sum of middle elements: " + counter);
+  }
+
+  public static void main(String[] args) {
     getSumOfValids();
+    getSumOfInvalids(getInvalidPages());
   }
 }
