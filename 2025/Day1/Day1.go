@@ -3,15 +3,14 @@ package main
 import (
 	"bufio"
 	"fmt"
+	"math"
 	"os"
 	"strconv"
 )
 
 func main() {
-	// test := [10]string{"L68", "L30", "R48", "L5", "R60", "L55", "L1", "L99", "R14", "L82"}
+	// test := []string{"L68", "L30", "R48", "L5", "R60", "L55", "L1", "L99", "R14", "L82"}
 
-	totalZeros := 0
-	dial := 50
 	file, _ := os.Open("input.txt")
 	defer file.Close()
 
@@ -22,6 +21,13 @@ func main() {
 		rotations = append(rotations, scanner.Text())
 	}
 
+	partOneSolver(rotations)
+	partTwoSolver(rotations)
+}
+
+func partOneSolver(rotations []string) {
+	totalZeros := 0
+	dial := 50
 	for _, rotation := range rotations {
 		dir := string(rotation[0])
 		num, _ := strconv.Atoi(rotation[1:])
@@ -38,4 +44,29 @@ func main() {
 	}
 
 	fmt.Println(totalZeros)
+}
+
+func partTwoSolver(rotations []string) {
+	dial := 50
+	totalClicks := 0
+	for _, rotation := range rotations {
+		dir := string(rotation[0])
+		num, _ := strconv.Atoi(rotation[1:])
+
+		for num > 0 {
+			if dir == "R" {
+				dial++
+			} else {
+				dial--
+			}
+
+			if math.Abs(float64(dial)) == 100 || dial == 0 {
+				dial = 0
+				totalClicks++
+			}
+			num--
+		}
+
+	}
+	fmt.Println(totalClicks)
 }
